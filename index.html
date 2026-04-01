@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legal & Policies | Support Center</title>
+    <meta name="description" content="Official Terms of Service, Privacy Policy, and Refund Policy.">
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        /**
+         * TUTORIAL CONFIGURATION
+         * Change these values to personalize your page instantly!
+         */
+        const CONFIG = {
+            companyName: "Avec Rêve", // Your Company Name
+            logoUrl: "logo.png",            // Path to your logo
+            supportEmail: "support@avecreve.com",
+            lastUpdated: "March 29, 2026"
+        };
+    </script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+            --glass-blur: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            background-image: 
+                radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(79, 70, 229, 0.1) 0%, transparent 50%);
+            color: var(--text-main);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Hero / Header */
+        header {
+            padding: 2rem 1rem 2rem;
+            text-align: center;
+        }
+
+        .logo-container img {
+            max-width: 120px;
+            margin-bottom: 1.5rem;
+            filter: drop-shadow(0 0 20px rgba(99, 102, 241, 0.3));
+        }
+
+        header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        /* Navigation Tabs */
+        .tabs-container {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem auto;
+            max-width: 600px;
+            padding: 0.5rem;
+            background: var(--card-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            position: sticky;
+            top: 1rem;
+            z-index: 100;
+        }
+
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 100px;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .tab-btn:hover:not(.active) {
+            color: white;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Content Sections */
+        main {
+            flex: 1;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 0 1.5rem 4rem;
+        }
+
+        .policy-section {
+            background: var(--card-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 3rem;
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .policy-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            margin-bottom: 2rem;
+            color: white;
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin: 1.5rem 0 0.75rem;
+            color: #fff;
+        }
+
+        p, li {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            font-size: 1.05rem;
+        }
+
+        ul {
+            padding-left: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .last-updated {
+            font-size: 0.9rem;
+            font-style: italic;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 3rem 1rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            header h1 { font-size: 2.2rem; }
+            .tabs-container {
+                flex-direction: row;
+                flex-wrap: wrap;
+                border-radius: 20px;
+                gap: 0.5rem;
+            }
+            .tab-btn { flex: 1 1 calc(50% - 1rem); padding: 0.5rem; font-size: 0.9rem; }
+            .policy-section { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-container">
+            <img src="logo.png" id="main-logo" alt="Company Logo">
+        </div>
+        <h1 id="header-title">Legal & Compliance</h1>
+        <p>Transparency and rules for <span class="company-name-text">your community</span>.</p>
+    </header>
+
+    <div class="tabs-container">
+        <button class="tab-btn active" data-target="privacy">Privacy Policy</button>
+        <button class="tab-btn" data-target="terms">Terms of Service</button>
+        <button class="tab-btn" data-target="refund">Refund Policy</button>
+        <button class="tab-btn" data-target="cookies">Cookie Policy</button>
+        <button class="tab-btn" data-target="contact">Contact</button>
+    </div>
+
+    <main id="content">
+        <!-- Privacy Policy -->
+        <section id="privacy" class="policy-section active">
+            <h2>Privacy Policy</h2>
+            <p class="last-updated">Last Updated: March 29, 2026</p>
+            <p>Your privacy is important to us. This policy explains how we collect, use, and protect your information when you use our services.</p>
+            
+            <h3>1. Information Collection</h3>
+            <p>We collect information that you provide directly to us, such as when you create an account, make a purchase, or contact us for support.</p>
+            
+            <h3>2. Use of Information</h3>
+            <p>We use your information to provide and improve our services, communicate with you, and ensure security across our platform.</p>
+            
+            <h3>3. Data Security</h3>
+            <p>We implement industry-standard security measures to protect your data from unauthorized access or disclosure.</p>
+            
+            <h3>4. Your Rights</h3>
+            <p>You have the right to access, update, or delete your personal information at any time. Simply reach out to us via our contact page.</p>
+        </section>
+
+        <!-- Terms of Service -->
+        <section id="terms" class="policy-section">
+            <h2>Terms of Service</h2>
+            <p class="last-updated">Last Updated: March 29, 2026</p>
+            <p>By accessing our website or services, you agree to comply with the following terms and conditions.</p>
+            
+            <h3>1. Acceptance of Terms</h3>
+            <p>Your use of our services constitutes your acceptance of these terms. If you do not agree, please do not use our services.</p>
+            
+            <h3>2. Use License</h3>
+            <p>Permission is granted to temporarily download one copy of the materials for personal, non-commercial transitory viewing only.</p>
+            
+            <h3>3. Disclaimer</h3>
+            <p>The materials on our website are provided on an 'as is' basis. We make no warranties, expressed or implied, and hereby disclaim all other warranties.</p>
+            
+            <h3>4. Limitations</h3>
+            <p>In no event shall we be liable for any damages arising out of the use or inability to use the materials on our website.</p>
+        </section>
+
+        <!-- Refund Policy -->
+        <section id="refund" class="policy-section">
+            <h2>Refund Policy</h2>
+            <p class="last-updated">Last Updated: March 29, 2026</p>
+            <p>We want you to be satisfied with our service. If you are not completely happy, please review our refund policy below.</p>
+            
+            <h3>1. Eligibility</h3>
+            <p>Refunds are available for requests made within 14 days of the original purchase date, provided the service has not been fully utilized.</p>
+            
+            <h3>2. Process</h3>
+            <p>To request a refund, please contact our support team with your order number and the reason for your request.</p>
+            
+            <h3>3. Non-Refundable</h3>
+            <p>Certain digital items or one-time services may be non-refundable once accessed or completed.</p>
+        </section>
+
+        <!-- Cookie Policy -->
+        <section id="cookies" class="policy-section">
+            <h2>Cookie Policy</h2>
+            <p class="last-updated">Last Updated: March 29, 2026</p>
+            <p>We use cookies to improve your experience and analyze our traffic.</p>
+            
+            <h3>1. What are Cookies?</h3>
+            <p>Cookies are small text files stored on your device to help websites remember your preferences.</p>
+            
+            <h3>2. How We Use Them</h3>
+            <p>We use essential cookies for site functionality and analytical cookies to understand how you interact with our content.</p>
+            
+            <h3>3. Managing Cookies</h3>
+            <p>You can control or reset your cookies through your browser settings at any time.</p>
+        </section>
+
+        <!-- One More Thing: Contact -->
+        <section id="contact" class="policy-section">
+            <h2>Contact Us</h2>
+            <p>Have questions about our policies or need support? We're here to help.</p>
+            
+            <div style="margin-top: 2rem;">
+                <h3>Email Support</h3>
+                <p id="support-email-text">support@example.com</p>
+                
+                <h3>Global Office</h3>
+                <p><span class="company-name-text">Company Name</span> HQ<br>Silicon Valley, CA 94025<br>United States</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 <span class="company-name-text">Company Name</span> Compliance Hub. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Update Page Content based on CONFIG
+        document.addEventListener('DOMContentLoaded', () => {
+            // Update all company name placeholders
+            document.querySelectorAll('.company-name-text').forEach(el => {
+                el.innerText = CONFIG.companyName;
+            });
+            
+            // Update Logo
+            document.getElementById('main-logo').src = CONFIG.logoUrl;
+            
+            // Update Email
+            document.getElementById('support-email-text').innerText = CONFIG.supportEmail;
+            
+            // Update Last Updated dates
+            document.querySelectorAll('.last-updated').forEach(el => {
+                el.innerText = "Last Updated: " + CONFIG.lastUpdated;
+            });
+
+            // Initial Route Check
+            handleRouting();
+        });
+
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const sections = document.querySelectorAll('.policy-section');
+
+        function switchTab(target, pushState = true) {
+            // Remove active class from buttons
+            tabBtns.forEach(b => b.classList.remove('active'));
+            const activeBtn = Array.from(tabBtns).find(b => b.getAttribute('data-target') === target);
+            if(activeBtn) activeBtn.classList.add('active');
+
+            // Switch sections
+            sections.forEach(sec => {
+                sec.classList.remove('active');
+                if(sec.id === target) {
+                    sec.classList.add('active');
+                }
+            });
+
+            // Update URL if requested
+            if(pushState) {
+                const path = target === 'privacy' ? '/' : '/' + target;
+                history.pushState({ target }, '', path);
+            }
+
+            // Smooth scroll to top of content
+            window.scrollTo({
+                top: document.getElementById('content').offsetTop - 100,
+                behavior: 'smooth'
+            });
+        }
+
+        function handleRouting() {
+            const path = window.location.pathname.replace(/^\/|\/$/g, '');
+            const target = path || 'privacy'; // Default to privacy if root
+            
+            // Validate if section exists
+            const section = document.getElementById(target);
+            if(section) {
+                switchTab(target, false);
+            } else {
+                switchTab('privacy', false);
+            }
+        }
+
+        // Handle Browser Forward/Back
+        window.addEventListener('popstate', (e) => {
+            if(e.state && e.state.target) {
+                switchTab(e.state.target, false);
+            } else {
+                handleRouting();
+            }
+        });
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const target = btn.getAttribute('data-target');
+                switchTab(target);
+            });
+        });
+    </script>
+</body>
+</html>

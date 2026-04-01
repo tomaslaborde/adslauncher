@@ -1,0 +1,187 @@
+"""
+bot.py
+Telegram bot que actúa como Media Buyer AI.
+Recibe instrucciones en lenguaje natural y ejecuta el pipeline de Meta Ads.
+"""
+
+import asyncio
+import os
+import subprocess
+import tempfile
+from dotenv import load_dotenv
+from telegram import Update
+from telegram.ext import Application, MessageHandler, filters, ContextTypes
+import anthropic
+
+load_dotenv()
+
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+VENV_PYTHON = os.path.join(PROJECT_DIR, ".venv/bin/python")
+
+client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+
+SYSTEM_PROMPT = """Sos un AI Media Buyer especializado en Meta Ads. Tu trabajo es ejecutar campañas publicitarias en Meta (Facebook/Instagram) a partir de instrucciones en lenguaje natural.
+
+## Contexto del proyecto
+- Directorio: /Users/tomas/Downloads/meta_ads
+- Python ejecutable: /Users/tomas/Downloads/meta_ads/.venv/bin/python
+- Credenciales en .env (ya cargadas)
+
+## Cuentas publicitarias
+- **CREMA** (default): Ad Account `1402894801163186`, Página Alpha For Men `552919854574913`
+- **Stolar**: Ad Account `345055025230307` (fanpage a confirmar)
+
+## Configuración estándar de adsets en [CREMA]
+- bid_strategy: COST_CAP
+- billing_event: IMPRESSIONS
+- optimization_goal: OFFSITE_CONVERSIONS
+- pixel_id: `9394963073898135`, evento: PURCHASE
+- targeting: AR, 18-65, Advantage Audience ON, brand_safety RELAXED
+- Status siempre PAUSED al crear
+
+## Copy base de CREMA
+- message: "Tu piel pierde colágeno cada año, a menos que hagas algo al respecto. 👇\\n\\n🇦🇷 Probá ALPHA, la primera Marca de Skin Care Masculino en Argentina.\\n\\n⭐Apoya la firmeza y elasticidad de la piel.\\n⭐Ayuda a reducir las líneas finas y las arrugas.\\n⭐Defiende contra la descomposición del colágeno y el envejecimiento.\\n\\n🔬 Respaldado por la ciencia. \\n\\nConsigue el tuyo ahora con envío sin costo y 3 cuotas sin interés"
+- title: "🇦🇷 #1 Skincare para hombres en Argentina"
+- description: "Poco Stock Disponible"
+- link: "https://alphamencare.com.ar/productos/crema-anti-age-luci-mas-joven-eliminando-lineas-finas-y-arrugas/"
+- CTA: LEARN_MORE
+
+## Tokens
+- META_ACCESS_TOKEN: user token de larga duración (60 días desde abril 2026)
+- META_PAGE_ACCESS_TOKEN: page token de Alpha For Men (usar para crear creatives)
+
+## Tu flujo cuando recibís un brief
+1. Identificá la campaña destino (buscala por nombre si hace falta)
+2. Descargá los creativos del Drive con gdown si hay un link
+3. Creá el adset con la config indicada
+4. Subí cada imagen y creá un ad por creativo
+5. Reportá los IDs creados
+
+## Reglas
+- Siempre creá adsets en estado PAUSED
+- Nunca modifiques archivos de src/services/ o src/config/
+- Si el token expiró (error 190), avisale al usuario que genere uno nuevo
+- Respondé siempre en español, de forma concisa
+
+Usá la herramienta run_python para ejecutar código Python contra la API de Meta. Podés hacer múltiples llamadas si necesitás primero explorar y luego ejecutar."""
+
+TOOLS = [
+    {
+        "name": "run_python",
+        "description": "Ejecuta código Python en el contexto del proyecto Meta Ads. Tiene acceso a facebook_business SDK, gdown, las credenciales del .env, y todos los módulos del proyecto.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string",
+                    "description": "Código Python a ejecutar. El .env ya está cargado. Importá lo que necesites."
+                }
+            },
+            "required": ["code"]
+        }
+    }
+]
+
+
+def execute_python(code: str) -> str:
+    """Ejecuta código Python en el venv del proyecto."""
+    wrapper = f"""
+import sys
+import os
+sys.path.insert(0, '{PROJECT_DIR}')
+os.chdir('{PROJECT_DIR}')
+
+from dotenv import load_dotenv
+load_dotenv()
+
+import warnings
+warnings.filterwarnings('ignore')
+
+{code}
+"""
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
+        f.write(wrapper)
+        tmp_path = f.name
+
+    try:
+        result = subprocess.run(
+            [VENV_PYTHON, tmp_path],
+            capture_output=True,
+            text=True,
+            timeout=120,
+            cwd=PROJECT_DIR
+        )
+        output = result.stdout
+        if result.stderr:
+            # Filtrar warnings de urllib3
+            stderr_lines = [l for l in result.stderr.split('\n')
+                          if 'NotOpenSSLWarning' not in l and 'WARNING:root' not in l and l.strip()]
+            if stderr_lines:
+                output += "\nSTDERR:\n" + '\n'.join(stderr_lines)
+        return output or "(sin output)"
+    except subprocess.TimeoutExpired:
+        return "ERROR: Timeout después de 120 segundos"
+    except Exception as e:
+        return f"ERROR: {e}"
+    finally:
+        os.unlink(tmp_path)
+
+
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_message = update.message.text
+    await update.message.reply_text("⏳ Procesando...")
+
+    messages = [{"role": "user", "content": user_message}]
+
+    try:
+        while True:
+            response = client.messages.create(
+                model="claude-opus-4-6",
+                max_tokens=4096,
+                system=SYSTEM_PROMPT,
+                tools=TOOLS,
+                messages=messages
+            )
+
+            if response.stop_reason == "end_turn":
+                text = next((b.text for b in response.content if hasattr(b, 'text')), "✅ Listo.")
+                await update.message.reply_text(text)
+                break
+
+            elif response.stop_reason == "tool_use":
+                tool_block = next(b for b in response.content if b.type == "tool_use")
+
+                if tool_block.name == "run_python":
+                    code = tool_block.input["code"]
+                    await update.message.reply_text(f"🔧 Ejecutando...")
+                    result = execute_python(code)
+
+                    messages.append({"role": "assistant", "content": response.content})
+                    messages.append({
+                        "role": "user",
+                        "content": [{
+                            "type": "tool_result",
+                            "tool_use_id": tool_block.id,
+                            "content": result
+                        }]
+                    })
+            else:
+                await update.message.reply_text("⚠️ Respuesta inesperada del modelo.")
+                break
+
+    except Exception as e:
+        await update.message.reply_text(f"❌ Error: {e}")
+
+
+def main():
+    print("🤖 AI Media Buyer Bot iniciando...")
+    app = Application.builder().token(TELEGRAM_TOKEN).build()
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    print("✅ Bot corriendo. Esperando mensajes en Telegram...")
+    app.run_polling()
+
+
+if __name__ == "__main__":
+    main()
