@@ -13,7 +13,7 @@ from telegram import Update
 from telegram.ext import Application, MessageHandler, filters, ContextTypes
 import anthropic
 
-load_dotenv()
+load_dotenv(override=False)  # No override env vars already set (e.g. Railway)
 
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
@@ -94,7 +94,7 @@ sys.path.insert(0, '{PROJECT_DIR}')
 os.chdir('{PROJECT_DIR}')
 
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv(override=False)
 
 import warnings
 warnings.filterwarnings('ignore')
