@@ -137,7 +137,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     messages = [{"role": "user", "content": user_message}]
 
     try:
-        while True:
+        max_steps = 8
+        steps = 0
+        while steps < max_steps:
             response = client.messages.create(
                 model="claude-haiku-4-5-20251001",
                 max_tokens=4096,
@@ -160,7 +162,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
                 if tool_block.name == "run_python":
                     code = tool_block.input["code"]
-                    await update.message.reply_text(f"🔧 Ejecutando...")
+                    steps += 1
+                    await update.message.reply_text(f"🔧 Ejecutando... ({steps}/{max_steps})")
                     result = execute_python(code)
 
                     messages.append({"role": "assistant", "content": response.content})
@@ -175,6 +178,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             else:
                 await update.message.reply_text("⚠️ Respuesta inesperada del modelo.")
                 break
+        else:
+            await update.message.reply_text("⚠️ Se alcanzó el límite de pasos. Intentá con una tarea más simple.")
 
     except Exception as e:
         await update.message.reply_text(f"❌ Error: {e}")
