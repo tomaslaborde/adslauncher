@@ -11,7 +11,7 @@ import sys
 import tempfile
 from dotenv import load_dotenv
 from telegram import Update
-from telegram.ext import Application, MessageHandler, filters, ContextTypes
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 import anthropic
 
 load_dotenv(override=False)  # No override env vars already set (e.g. Railway)
@@ -131,6 +131,10 @@ warnings.filterwarnings('ignore')
         os.unlink(tmp_path)
 
 
+async def ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("✅ Bot activo en Railway")
+
+
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_message = update.message.text
     await update.message.reply_text("⏳ Procesando...")
@@ -194,12 +198,13 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text("⚠️ Se alcanzó el límite de pasos. Intentá con una tarea más simple.")
 
     except Exception as e:
-        await update.message.reply_text(f"❌ Error: {e}")
+        await update.message.reply_text(f"❌ Error tipo: {type(e).__name__}\nDetalle: {str(e)[:300]}")
 
 
 def main():
     print("🤖 AI Media Buyer Bot iniciando...")
     app = Application.builder().token(TELEGRAM_TOKEN).build()
+    app.add_handler(CommandHandler("ping", ping))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     print("✅ Bot corriendo. Esperando mensajes en Telegram...")
     app.run_polling(drop_pending_updates=True, allowed_updates=Update.ALL_TYPES)
