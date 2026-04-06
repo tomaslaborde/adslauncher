@@ -200,6 +200,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     steps += 1
                     await update.message.reply_text(f"🔧 Ejecutando... ({steps}/{max_steps})")
                     result = execute_python(code)
+                    # Truncar resultado si es muy largo para no exceder límite de tokens
+                    if len(result) > 4000:
+                        result = result[:4000] + "\n...[truncado]"
 
                     messages.append({"role": "assistant", "content": response.content})
                     messages.append({
