@@ -5,6 +5,8 @@ Recibe instrucciones en lenguaje natural y ejecuta el pipeline de Meta Ads.
 """
 
 import asyncio
+import concurrent.futures
+import functools
 import os
 import subprocess
 import sys
@@ -21,7 +23,8 @@ ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 VENV_PYTHON = sys.executable  # Uses whatever Python is running this bot (works locally and on Railway)
 
-client = anthropic.AsyncAnthropic(api_key=ANTHROPIC_API_KEY)
+client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+executor = concurrent.futures.ThreadPoolExecutor(max_workers=4)
 
 SYSTEM_PROMPT = f"""Sos un AI Media Buyer especializado en Meta Ads. Tu trabajo es ejecutar campañas publicitarias en Meta (Facebook/Instagram) a partir de instrucciones en lenguaje natural.
 
@@ -149,16 +152,21 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             response = None
             for attempt in range(3):
                 try:
-                    response = await client.messages.create(
-                        model="claude-haiku-4-5-20251001",
-                        max_tokens=4096,
-                        system=[{
-                            "type": "text",
-                            "text": SYSTEM_PROMPT,
-                            "cache_control": {"type": "ephemeral"}
-                        }],
-                        tools=TOOLS,
-                        messages=messages
+                    loop = asyncio.get_event_loop()
+                    response = await loop.run_in_executor(
+                        executor,
+                        functools.partial(
+                            client.messages.create,
+                            model="claude-haiku-4-5-20251001",
+                            max_tokens=4096,
+                            system=[{
+                                "type": "text",
+                                "text": SYSTEM_PROMPT,
+                                "cache_control": {"type": "ephemeral"}
+                            }],
+                            tools=TOOLS,
+                            messages=messages
+                        )
                     )
                     break
                 except Exception as conn_err:
