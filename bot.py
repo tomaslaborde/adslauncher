@@ -21,7 +21,7 @@ ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 VENV_PYTHON = sys.executable  # Uses whatever Python is running this bot (works locally and on Railway)
 
-client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+client = anthropic.AsyncAnthropic(api_key=ANTHROPIC_API_KEY)
 
 SYSTEM_PROMPT = f"""Sos un AI Media Buyer especializado en Meta Ads. Tu trabajo es ejecutar campañas publicitarias en Meta (Facebook/Instagram) a partir de instrucciones en lenguaje natural.
 
@@ -132,16 +132,7 @@ warnings.filterwarnings('ignore')
 
 
 async def ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    key = os.getenv("ANTHROPIC_API_KEY", "")
-    try:
-        test = anthropic.Anthropic(api_key=key).messages.create(
-            model="claude-haiku-4-5-20251001",
-            max_tokens=5,
-            messages=[{"role": "user", "content": "hi"}]
-        )
-        await update.message.reply_text(f"✅ Bot activo. Anthropic OK. Key termina en: ...{key[-6:]}")
-    except Exception as e:
-        await update.message.reply_text(f"✅ Bot activo\n❌ SDK error: {type(e).__name__}: {str(e)[:300]}\nKey termina en: ...{key[-6:]}")
+    await update.message.reply_text("✅ Bot activo en Railway")
 
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -158,7 +149,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             response = None
             for attempt in range(3):
                 try:
-                    response = client.messages.create(
+                    response = await client.messages.create(
                         model="claude-haiku-4-5-20251001",
                         max_tokens=4096,
                         system=[{
