@@ -132,7 +132,12 @@ warnings.filterwarnings('ignore')
 
 
 async def ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("✅ Bot activo en Railway")
+    import httpx
+    try:
+        r = httpx.get("https://api.anthropic.com", timeout=10)
+        await update.message.reply_text(f"✅ Bot activo. Anthropic alcanzable: HTTP {r.status_code}")
+    except Exception as e:
+        await update.message.reply_text(f"✅ Bot activo\n❌ Anthropic inaccesible: {type(e).__name__}: {str(e)[:200]}")
 
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
