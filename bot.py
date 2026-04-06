@@ -7,6 +7,7 @@ Recibe instrucciones en lenguaje natural y ejecuta el pipeline de Meta Ads.
 import asyncio
 import os
 import subprocess
+import sys
 import tempfile
 from dotenv import load_dotenv
 from telegram import Update
@@ -18,7 +19,7 @@ load_dotenv(override=False)  # No override env vars already set (e.g. Railway)
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
-VENV_PYTHON = os.path.join(PROJECT_DIR, ".venv/bin/python")
+VENV_PYTHON = sys.executable  # Uses whatever Python is running this bot (works locally and on Railway)
 
 client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
 
