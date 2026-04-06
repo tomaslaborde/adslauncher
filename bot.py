@@ -19,7 +19,7 @@ import anthropic
 load_dotenv(override=False)  # No override env vars already set (e.g. Railway)
 
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
+ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "").strip()
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 VENV_PYTHON = sys.executable  # Uses whatever Python is running this bot (works locally and on Railway)
 
