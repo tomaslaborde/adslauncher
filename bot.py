@@ -135,7 +135,18 @@ warnings.filterwarnings('ignore')
 
 
 async def ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("✅ Bot activo en Railway")
+    import httpx, json
+    key = os.getenv("ANTHROPIC_API_KEY", "")
+    try:
+        r = httpx.post(
+            "https://api.anthropic.com/v1/messages",
+            headers={"x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json"},
+            json={"model": "claude-haiku-4-5-20251001", "max_tokens": 5, "messages": [{"role": "user", "content": "hi"}]},
+            timeout=30
+        )
+        await update.message.reply_text(f"✅ POST directo: {r.status_code}\n{r.text[:200]}")
+    except Exception as e:
+        await update.message.reply_text(f"❌ POST falló: {type(e).__name__}: {str(e)[:200]}")
 
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
