@@ -172,7 +172,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         executor,
                         functools.partial(
                             client.messages.create,
-                            model="claude-haiku-4-5-20251001",
+                            model="claude-sonnet-4-6",
                             max_tokens=4096,
                             system=[{
                                 "type": "text",
