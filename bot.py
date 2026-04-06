@@ -156,7 +156,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     messages = [{"role": "user", "content": user_message}]
 
     try:
-        max_steps = 8
+        max_steps = 20
         steps = 0
         while steps < max_steps:
             # Retry hasta 3 veces si hay connection error
