@@ -132,12 +132,16 @@ warnings.filterwarnings('ignore')
 
 
 async def ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    import httpx
+    key = os.getenv("ANTHROPIC_API_KEY", "")
     try:
-        r = httpx.get("https://api.anthropic.com", timeout=10)
-        await update.message.reply_text(f"✅ Bot activo. Anthropic alcanzable: HTTP {r.status_code}")
+        test = anthropic.Anthropic(api_key=key).messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=5,
+            messages=[{"role": "user", "content": "hi"}]
+        )
+        await update.message.reply_text(f"✅ Bot activo. Anthropic OK. Key termina en: ...{key[-6:]}")
     except Exception as e:
-        await update.message.reply_text(f"✅ Bot activo\n❌ Anthropic inaccesible: {type(e).__name__}: {str(e)[:200]}")
+        await update.message.reply_text(f"✅ Bot activo\n❌ SDK error: {type(e).__name__}: {str(e)[:300]}\nKey termina en: ...{key[-6:]}")
 
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
