@@ -141,17 +141,28 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         max_steps = 8
         steps = 0
         while steps < max_steps:
-            response = client.messages.create(
-                model="claude-haiku-4-5-20251001",
-                max_tokens=4096,
-                system=[{
-                    "type": "text",
-                    "text": SYSTEM_PROMPT,
-                    "cache_control": {"type": "ephemeral"}
-                }],
-                tools=TOOLS,
-                messages=messages
-            )
+            # Retry hasta 3 veces si hay connection error
+            response = None
+            for attempt in range(3):
+                try:
+                    response = client.messages.create(
+                        model="claude-haiku-4-5-20251001",
+                        max_tokens=4096,
+                        system=[{
+                            "type": "text",
+                            "text": SYSTEM_PROMPT,
+                            "cache_control": {"type": "ephemeral"}
+                        }],
+                        tools=TOOLS,
+                        messages=messages
+                    )
+                    break
+                except Exception as conn_err:
+                    if attempt == 2:
+                        raise conn_err
+                    await asyncio.sleep(3)
+            if response is None:
+                break
 
             if response.stop_reason == "end_turn":
                 text = next((b.text for b in response.content if hasattr(b, 'text')), "✅ Listo.")
@@ -191,7 +202,7 @@ def main():
     app = Application.builder().token(TELEGRAM_TOKEN).build()
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     print("✅ Bot corriendo. Esperando mensajes en Telegram...")
-    app.run_polling()
+    app.run_polling(drop_pending_updates=True, allowed_updates=Update.ALL_TYPES)
 
 
 if __name__ == "__main__":
