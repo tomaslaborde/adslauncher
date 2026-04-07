@@ -35,7 +35,7 @@ SYSTEM_PROMPT = f"""Sos un AI Media Buyer especializado en Meta Ads. Tu trabajo 
 
 ## Cuentas publicitarias
 - **CREMA** (default): Ad Account `1402894801163186`, Página Alpha For Men `552919854574913`
-- **Stolar**: Ad Account `345055025230307` (fanpage a confirmar)
+- **Stolar**: Ad Account `345055025230307`, Página `61555777743150`
 - **Shampoo**: Ad Account `495744695407533`
 
 ## Configuración estándar de adsets en [CREMA]
@@ -66,7 +66,7 @@ Escribí UN SOLO script Python que haga todo de una vez:
 5. Crear los adsets y ads de una sola vez
 6. Imprimir los IDs creados
 
-**IMPORTANTE: Usá run_python UNA o DOS veces máximo. No explores paso a paso — escribí el script completo desde el principio.**
+**IMPORTANTE: Usá run_python UNA sola vez. Escribí el script completo desde el principio sin llamadas exploratorias previas. Si necesitás el ID de algo (campaña, adset), buscalo dentro del mismo script con un filtro por nombre. Nunca hagas una llamada solo para explorar y luego otra para ejecutar.**
 
 ## Reglas
 - Siempre creá adsets en estado PAUSED
@@ -160,7 +160,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     messages = [{"role": "user", "content": user_message}]
 
     try:
-        max_steps = 20
+        max_steps = 40
         steps = 0
         while steps < max_steps:
             # Retry hasta 3 veces si hay connection error
